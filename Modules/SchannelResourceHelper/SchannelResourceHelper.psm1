@@ -21,8 +21,8 @@ function Switch-SchannelProtocol {
     }
 
     switch ($Enable) {
-        True  { $value = '0xffffffff' }
-        False { $value = '0'          }
+        True  { $value = '1' }
+        False { $value = '0' }
     }
 
     New-ItemProperty -Path $protocolKey -Name 'Enabled' -Value $value -PropertyType Dword -Force | Out-Null

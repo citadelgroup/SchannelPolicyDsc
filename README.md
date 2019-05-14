@@ -1,206 +1,124 @@
-# cSchannel
-cSchannel Dsc Resource to modify SSL endpoint configuration
+# SchannelPolicyDsc
 
-The **cSchannel** DSC resource configures all aspects of SCHANNEL. For quick reference of the best settings check 
-(https://www.nartac.com/Products/IISCrypto)
-
-Also Alexander Hass wrote an article and scripts to do the same:
-(https://www.hass.de/content/setup-your-iis-ssl-perfect-forward-secrecy-and-tls-12)
+SchannelPolicyDsc is a module written to provide PowerShell DSC configuration resources to manipulate Schannel.
 
 ## Resources
 
-* **cProtocol** set protocol configuration 
-* **cCipher** set Cipher configuration
-* **cHash** set hashes configuration
-* **cKeyExchangeAlgoritm** set KeyExchangeAlgorithms configuration
-* **cCipherSuites** set cipher suites order
+* [Cipher](#cipher): Provides a mechanism to set individual ciphers.
+* [CipherSuites](#ciphersuites): Provides a mechanism to set cipher suite order.
+* [Hash](#hash): Provides a mechanism to set individual hash functions.
+* [KeyExchangeAlgorithm](#keyexchangealgorithm): Provides a mechanism to set individual key exchange algorithms.
+* [Protocol](#Protocol): Provides a mechanism to set individual protocols.
 
-### cProtocol
-* **Protocol**: Set configuration for any of these protocols 
-	* Valid values include: {'Multi-Protocol Unified Hello'|'PCT 1.0'|'SSL 2.0'|'SSL 3.0'|'TLS 1.0'|'TLS 1.1'|'TLS 1.2'}
-* **includeClientSide** : Include client schannel protocol 
-	* Valid values include: {$true | $false}
-* **Ensure**: Wheter the SCHANNEL procotol is allowed {Present} or denied {Absent}
+### Cipher
 
-### cCipher
-* **Cipher**: Set configuration for any of these ciphers
-	* Valid values include: {'AES 128/128'|'AES 256/256'|'DES 56/56'|'NULL'|'RC2 128/128'|'RC2 40/128'|'RC2 56/128'|'RC4 128/128'|'RC4 40/128'|'RC4 56/128'|'RC4 64/128'|'Triple DES 168'}
-* **Ensure**: Wheter the SCHANNEL Cipher is allowed {Present} or denied {Absent}
+Provides a mechanism to set individual ciphers.
 
-### cHash
-* **Hash**: Set configuration for any of these Hashes
-	* Valid values include: {'MD5'|'SHA'|'SHA256'|'SHA384'|'SHA512'}
-* **Ensure**: Wheter the SCHANNEL Hash is allowed {Present} or denied {Absent}
+#### Requirements
 
-### cKeyExchangeAlgoritm
-* **KeyExchangeAlgoritm**: Set configuration for any of these Key Exchange Algoritms
-	* Valid values include: {'Diffie-Hellman'|'ECDH'|'PKCS'}
-* **Ensure**: Wheter the SCHANNEL KeyExchangeAlgoritm is allowed {Present} or denied {Absent}
+None
 
-### cCipherSuites
-* **CipherSuitesOrder**: Array of cipher suites.
-* **Ensure**: Wheter the CryptoCipherSuites is modified {Present} or Serverdefaults. {Absent}
+#### Parameters
 
-## Example
+* **[String] Cipher** _(Key)_: The name of the cipher you want to configure. { AES 128/128 | AES 256/256 | DES 56/56 | NULL | RC2 128/128 | RC2 40/128 | RC2 56/128 | RC4 128/128 | RC4 40/128 | RC4 56/128 | RC4 64/128 | Triple DES 168 }
+* **[String] Ensure** _(Write)_: The desired state of the cipher. { *Present* | Absent }
 
-```powershell
-configuration Sample_cSchannel
-{
-    Import-DscResource -ModuleName cSchannel -ModuleVersion 1.0
+#### Read-Only Properties from Get-TargetResource
 
-    #region settings
-    $DeniedProtocols = @(
-    @{Protocol='Multi-Protocol Unified Hello';Ensure='Absent'},
-    @{Protocol='PCT 1.0';Ensure='Absent'},
-    @{Protocol='SSL 2.0';Ensure='Absent'},
-    @{Protocol='SSL 3.0';Ensure='Absent'}
-    )
+* **[String] Enabled** _(Write)_: The current state of the cipher. { Yes | No }
 
-    $AllowedProtocols = @(
-    @{Protocol='TLS 1.0';Ensure='Present'},
-    @{Protocol='TLS 1.1';Ensure='Present'},
-    @{Protocol='TLS 1.2';Ensure='Present'}
-    )
+#### Examples
 
-    $DeniedCiphers = @(
-    @{Cipher='DES 56/56';Ensure='Absent'},
-    @{Cipher='NULL';Ensure='Absent'},
-    @{Cipher='RC2 128/128';Ensure='Absent'},
-    @{Cipher='RC2 40/128';Ensure='Absent'},
-    @{Cipher='RC2 56/128';Ensure='Absent'},
-    @{Cipher='RC4 128/128';Ensure='Absent'},
-    @{Cipher='RC4 40/128';Ensure='Absent'},
-    @{Cipher='RC4 56/128';Ensure='Absent'},
-    @{Cipher='RC4 64/128';Ensure='Absent'}
-    )
+* [Configure a cipher](https://github.com/citadelgroup/SchannelPolicyDsc/blob/master/Examples/Sample_ConfigureACipher.ps1)
 
-    $AllowedCiphers = @(
-    @{Cipher='AES 128/128';Ensure='Present'},
-    @{Cipher='AES 256/256';Ensure='Present'},
-    @{Cipher='Triple DES 168';Ensure='Present'}
-    )
+### CipherSuites
 
-    $AllowedHashes = @(
-    @{Hash='MD5';Ensure='Present'},
-    @{Hash='SHA';Ensure='Present'},
-    @{Hash='SHA256';Ensure='Present'},
-    @{Hash='SHA384';Ensure='Present'},
-    @{Hash='SHA512';Ensure='Present'}
-    )
+PProvides a mechanism to set cipher suite order.
 
-    $AllowedKeyExchangeAlgoritm =  @(
-    @{KeyExchangeAlgoritm='Diffie-Hellman';Ensure='Present'}, 
-    @{KeyExchangeAlgoritm='ECDH';Ensure='Present'},
-    @{KeyExchangeAlgoritm='PKCS';Ensure='Present'}
-    )
+#### Requirements
 
-    $cipherSuites = @(
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P521',
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384',
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P521',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P384',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256',
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA_P521',
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA_P384',
-    'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA_P256',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA_P521',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA_P384',
-    'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA_P256',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384_P521',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384_P384',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256_P521',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256_P384',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256_P256',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384_P521',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384_P384',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256_P521',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256_P384',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256_P256',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA_P521',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA_P384',
-    'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA_P256',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA_P521',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA_P384',
-    'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA_P256',
-    'TLS_RSA_WITH_AES_256_GCM_SHA384',
-    'TLS_RSA_WITH_AES_128_GCM_SHA256',
-    'TLS_RSA_WITH_AES_256_CBC_SHA256',
-    'TLS_RSA_WITH_AES_128_CBC_SHA256',
-    'TLS_RSA_WITH_AES_256_CBC_SHA',
-    'TLS_RSA_WITH_AES_128_CBC_SHA',
-    'TLS_RSA_WITH_3DES_EDE_CBC_SHA'
-    )
-    #endregion
+None
 
-    node localhost{
-        foreach($Denied in $DeniedProtocols)
-        {
-            cProtocol ("Deny-" + ($Denied.Protocol).replace('.','').replace(' ', ''))
-            {
-                Protocol = $Denied.Protocol
-                Ensure = $Denied.Ensure
-                includeClientSide = $true
-            }
-        }
+#### Parameters
 
-        foreach($Allowed in $AllowedProtocols)
-        {
-            cProtocol ("Allow-" + ($Allowed.Protocol).replace('.','').replace(' ', ''))
-            {
-                Protocol = $Allowed.Protocol
-                Ensure = $Allowed.Ensure
-                includeClientSide = $true
-            }
-        }
+* **[String] IsSingleInstance** _(Key)_: This value must be set to "Yes". { *Yes* }
+* **[String[]] CipherSuitesOrder** _(Write)_: Array of ciphers in order of preference.
+* **[String] Ensure** _(Write)_:  The desired state of the cipher suite order. { *Present* | Absent }
 
-        foreach($Denied in $DeniedCiphers)
-        {
-            cCipher ("Deny-" + ($Denied.Cipher).replace('.','').replace(' ', '').replace('/','-'))
-            {
-                Cipher = $Denied.Cipher
-                Ensure = $Denied.Ensure
-                
-            }
-        }
+#### Read-Only Properties from Get-TargetResource
 
-        foreach($Allowed in $AllowedCiphers)
-        {
-            cCipher ("Allow-" + ($Allowed.Cipher).replace('.','').replace(' ', '').replace('/','-'))
-            {
-                Cipher = $Allowed.Cipher
-                Ensure = $Allowed.Ensure
-                
-            }
-        }
+* **[String] Exists** _(Write)_: The current state of the cipher suite order. { Yes | No }
 
-        foreach($Allowed in $AllowedHashes)
-        {
-            cHash ("Allow-" + ($Allowed.Hash))
-            {
-                Hash = $Allowed.Hash
-                Ensure = $Allowed.Ensure
-                
-            }
-        }
+#### Examples
 
-        foreach($Allowed in $AllowedKeyExchangeAlgoritm)
-        {
-            cKeyExchangeAlgoritm ("Allow-" + ($Allowed.KeyExchangeAlgoritm))
-            {
-                KeyExchangeAlgoritm = $Allowed.KeyExchangeAlgoritm
-                Ensure = $Allowed.Ensure
-                
-            }
-        }
+* [Configure a cipher suite order](https://github.com/citadelgroup/SchannelPolicyDsc/blob/master/Examples/Sample_ConfigureACipherSuiteOrder.ps1)
 
-       cCipherSuites CipherSuites
-       {
-            Ensure = "Present"
-            CipherSuitesOrder = $cipherSuites
-       }
-    }
-}
-Sample_cSchannel 
-```
+### Hash
 
+Provides a mechanism to set individual hash functions.
+
+#### Requirements
+
+None
+
+#### Parameters
+
+* **[String] Hash** _(Key)_: The name of the hash function you want to configure. { MD5 | SHA | SHA256 | SHA384 | SHA512 }
+* **[String] Ensure** _(Write)_: The desired state of the hash function. { *Present* | Absent }
+
+#### Read-Only Properties from Get-TargetResource
+
+* **[String] Exists** _(Write)_: The current state of the hash function. { Yes | No }
+
+#### Examples
+
+* [Configure a hash function](https://github.com/citadelgroup/SchannelPolicyDsc/blob/master/Examples/Sample_ConfigureAHashFunction.ps1)
+
+### KeyExchangeAlgorithm
+
+Provides a mechanism to set individual key exchange algorithms.
+
+#### Requirements
+
+None
+
+#### Parameters
+
+* **[String] Hash** _(Key)_: The name of the key exchange algorithm you want to configure. { Diffie-Hellman | ECDH | PKCS }
+* **[String] Ensure** _(Write)_: The desired state of the key exchange algorithm. { *Present* | Absent }
+
+#### Read-Only Properties from Get-TargetResource
+
+* **[String] Exists** _(Write)_: The current state of the key exchange algorithm. { Yes | No }
+
+#### Examples
+
+* [Configure a key exchange algorithm](https://github.com/citadelgroup/SchannelPolicyDsc/blob/master/Examples/Sample_ConfigureAKeyExchangeAlgorithm.ps1)
+
+### Protocol
+
+Provides a mechanism to set individual protocols.
+
+#### Requirements
+
+None
+
+#### Parameters
+
+* **[String] Hash** _(Key)_: The name of the protocol you want to configure. { Multi-Protocol Unified Hello | PCT 1.0 | SSL 2.0 | SSL 3.0 | TLS 1.0 | TLS 1.1 | TLS 1.2 }
+* **[String] Type** _(Key)_: The type of the protocol you want to configure. { Client | Server }
+* **[String] Ensure** _(Write)_: The desired state of the protocol. { *Present* | Absent }
+
+#### Read-Only Properties from Get-TargetResource
+
+* **[String] Exists** _(Write)_: The current state of the protocol. { Yes | No }
+
+#### Examples
+
+* [Configure a protocol](https://github.com/citadelgroup/SchannelPolicyDsc/blob/master/Examples/Sample_ConfigureAProtocol.ps1)
+
+## Versions
+
+### 1.0.0
+
+* Initial release of SchannelPolicyDsc.

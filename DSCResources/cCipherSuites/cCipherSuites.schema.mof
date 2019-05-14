@@ -1,8 +1,0 @@
-
-[ClassVersion("1.0.0.0"), FriendlyName("cCipherSuites")]
-class cCipherSuites : OMI_BaseResource
-{
-    [Write] String CipherSuitesOrder[];
-    [Key, ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
-};
-

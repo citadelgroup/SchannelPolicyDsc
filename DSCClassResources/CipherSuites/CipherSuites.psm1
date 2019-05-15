@@ -67,7 +67,7 @@ class CipherSuites {
         }
 
         if($this.Ensure -eq [Ensure]::Present) {
-            if($item -and $CurrentCipherSuitesOrder -eq $this.CipherSuitesOrder) {
+            if($item -and $CurrentCipherSuitesOrder -eq [string]::join(',', $this.CipherSuitesOrder)) {
                 return $true
             }
             else {

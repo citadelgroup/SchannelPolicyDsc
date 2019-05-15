@@ -70,7 +70,7 @@ class Protocol {
             }
         }
         else {
-            if(($Item | Get-ItemProperty).Enabled -eq 0 -or ($Item | Get-ItemProperty).DisabledByDefault -eq 1) {
+            if(($Item | Get-ItemProperty).Enabled -eq 0 -and ($Item | Get-ItemProperty).DisabledByDefault -eq 1) {
                 return $true
             }
             else {

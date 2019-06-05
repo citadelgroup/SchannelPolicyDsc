@@ -3,7 +3,7 @@
     #RootModule = 'SchannelPolicyDsc.psm1'
     
     # Version number of this module.
-    moduleVersion = '0.1.3'
+    moduleVersion = '1.0.0'
     
     # Supported PSEditions
     # CompatiblePSEditions = @()
